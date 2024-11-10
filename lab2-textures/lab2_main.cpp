@@ -44,6 +44,7 @@ GLuint shaderProgram;
 // The vertexArrayObject here will hold the pointers to
 // the vertex data (in positionBuffer) and color data per vertex (in colorBuffer)
 GLuint positionBuffer, colorBuffer, indexBuffer, texcoordBuffer, vertexArrayObject, texture;
+GLuint positionBuffer2, colorBuffer2, indexBuffer2, texcoordBuffer2, vertexArrayObject2, texture2;
 
 
 
@@ -151,6 +152,68 @@ void initialize()
 	stbi_image_free(image);
 
 
+	// Create a handle for the vertex array object
+	glGenVertexArrays(1, &vertexArrayObject2);
+	// Set it as current, i.e., related calls will affect this object
+	glBindVertexArray(vertexArrayObject2);
+
+	///////////////////////////////////////////////////////////////////////////
+	// Create the positions buffer object
+	///////////////////////////////////////////////////////////////////////////
+	const float positions2[] = {
+		// X      Y       Z
+		2.0f,  0.0f,  -20.0f, // v0
+		2.0f,  10.0f, -20.0f, // v1
+		12.0f, 10.0f, -20.0f, // v2
+		12.0f, 0.0f,  -20.0f  // v3
+		//2.0f, 0.0f, -15.0f,  // v0
+		//2.5f, 8.0f, -15.0f, // v1
+		//11.0f,  0.0f, -15.0f, // v2
+		//9.0f,  8.0f, -15.0f   // v3
+	};
+	// Create a handle for the vertex position buffer
+	glGenBuffers(1, &positionBuffer2);
+	// Set the newly created buffer as the current one
+	glBindBuffer(GL_ARRAY_BUFFER, positionBuffer2);
+	// Send the vetex position data to the current buffer
+	glBufferData(GL_ARRAY_BUFFER, labhelper::array_length(positions2) * sizeof(float), positions2,
+		GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, false /*normalized*/, 0 /*stride*/, 0 /*offset*/);
+	// Enable the attribute
+	glEnableVertexAttribArray(0);
+
+	float texcoords2[] = {
+		0.0f, 0.0f,    // (u,v) for v0
+		0.0f, 1.0f,   // (u,v) for v1
+		1.0f, 1.0f,   // (u,v) for v2
+		1.0f, 0.0f     // (u,v) for v3
+	};
+	glGenBuffers(1, &texcoordBuffer2);
+	glBindBuffer(GL_ARRAY_BUFFER, texcoordBuffer2);
+	glBufferData(GL_ARRAY_BUFFER, labhelper::array_length(texcoords2) * sizeof(float), texcoords2,
+		GL_STATIC_DRAW);
+	glVertexAttribPointer(2, 2, GL_FLOAT, false /*normalized*/, 0 /*stride*/, 0 /*offset*/);
+	glEnableVertexAttribArray(2);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+
+	int w2, h2, comp2; //Can use w, h, comp
+	unsigned char* image2 = stbi_load("../scenes/textures/explosion.png", &w2, &h2, &comp2, STBI_rgb_alpha);
+
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w2, h2, 0, GL_RGBA, GL_UNSIGNED_BYTE, image2);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	stbi_image_free(image2);
+
 }
 
 
@@ -199,6 +262,16 @@ void display(void)
 	glBindVertexArray(vertexArrayObject);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+	
+	glBindTexture(GL_TEXTURE_2D, texture2);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glBindVertexArray(vertexArrayObject2);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	glDisable(GL_BLEND);
 
 	glUseProgram(0); // "unsets" the current shader program. Not really necessary.
 }

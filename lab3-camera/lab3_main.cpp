@@ -246,22 +246,32 @@ bool handleEvents(void)
 	const uint8_t* state = SDL_GetKeyboardState(nullptr);
 
 	// implement camera controls based on key states
-	if(state[SDL_SCANCODE_UP])
-	{
-		printf("Key Up is pressed down\n");
-	}
-	if(state[SDL_SCANCODE_DOWN])
-	{
-		printf("Key Down is pressed down\n");
-	}
-	if(state[SDL_SCANCODE_LEFT])
-	{
-		printf("Key Left is pressed down\n");
-	}
-	if(state[SDL_SCANCODE_RIGHT])
+	const float speed = 10.f;
+
+	if (!ImGui::GetIO().WantCaptureKeyboard)
 	{
 		printf("Key Right is pressed down\n");
+		vec3 car_forward = vec3(0, 0, 1);
+		if (state[SDL_SCANCODE_UP])
+		{
+			T = translate(car_forward * speed * deltaTime) * T;
+		}
+		if (state[SDL_SCANCODE_DOWN])
+		{
+			T = translate(-car_forward * speed * deltaTime) * T;
+		}
+		if (state[SDL_SCANCODE_LEFT])
+		{
+			T = translate(vec3(1, 0, 0) * speed * deltaTime) * T;
+		}
+		if (state[SDL_SCANCODE_RIGHT])
+		{
+			T = translate(-vec3(1, 0, 0) * speed * deltaTime) * T;
+		}
 	}
+
+	carModelMatrix = T;
+
 
 	return quitEvent;
 }

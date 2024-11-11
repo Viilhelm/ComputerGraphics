@@ -247,11 +247,20 @@ bool handleEvents(void)
 
 	// implement camera controls based on key states
 	const float speed = 10.f;
+	const float rotateSpeed = 2.f;
 
 	if (!ImGui::GetIO().WantCaptureKeyboard)
 	{
-		printf("Key Right is pressed down\n");
 		vec3 car_forward = vec3(0, 0, 1);
+				if (state[SDL_SCANCODE_LEFT])
+		{
+			R = glm::rotate(rotateSpeed * deltaTime, glm::vec3(0, 1, 0)) * R;
+		}
+		if (state[SDL_SCANCODE_RIGHT])
+		{
+			R = glm::rotate(-rotateSpeed * deltaTime, glm::vec3(0, 1, 0)) * R;
+		}
+		car_forward = vec3(R * vec4(0, 0, 1, 0));
 		if (state[SDL_SCANCODE_UP])
 		{
 			T = translate(car_forward * speed * deltaTime) * T;
@@ -260,17 +269,11 @@ bool handleEvents(void)
 		{
 			T = translate(-car_forward * speed * deltaTime) * T;
 		}
-		if (state[SDL_SCANCODE_LEFT])
-		{
-			T = translate(vec3(1, 0, 0) * speed * deltaTime) * T;
-		}
-		if (state[SDL_SCANCODE_RIGHT])
-		{
-			T = translate(-vec3(1, 0, 0) * speed * deltaTime) * T;
-		}
 	}
 
-	carModelMatrix = T;
+	
+
+	carModelMatrix = T * R;
 
 
 	return quitEvent;

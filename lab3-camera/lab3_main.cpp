@@ -180,6 +180,19 @@ void display()
 	glUniformMatrix4fv(mloc, 1, false, &carModelMatrix[0].x);
 	render(carModel);
 
+	
+	// Draw a second car
+	//mat4 s = glm::scale(vec3(1.2f, 1.2f, 1.2f));
+	mat4 r = glm::rotate(float(currentTime * M_PI * -0.5f), vec3(0.0f, 1.0f, 0.0f));
+	mat4 t = glm::translate(vec3(25.0f, 0.0f, 0.0f));
+	mat4 t2 = glm::translate(vec3(r * vec4(10.f, 0, 0, 1.f)));
+	mat4 car2ModelMatrix = t * t2 * r; //* s;;
+	modelViewProjectionMatrix = projectionMatrix * viewMatrix * car2ModelMatrix;
+	// Update the modelViewProjectionMatrix used in the vertex shader
+	glUniformMatrix4fv(mvploc, 1, false, &modelViewProjectionMatrix[0].x);
+	glUniformMatrix4fv(mloc, 1, false, &car2ModelMatrix[0].x);
+	render(carModel);
+	
 
 	glUseProgram(0);
 }

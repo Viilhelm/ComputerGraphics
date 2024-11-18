@@ -192,7 +192,7 @@ void display()
 	// Draw a second car
 	//mat4 s = glm::scale(vec3(1.2f, 1.2f, 1.2f));
 	mat4 r = glm::rotate(float(currentTime * M_PI * -0.5f), vec3(0.0f, 1.0f, 0.0f));
-	mat4 t = glm::translate(vec3(25.0f, 0.0f, 0.0f));
+	mat4 t = glm::translate(vec3(20.0f, 0.0f, 0.0f));
 	mat4 t2 = glm::translate(vec3(r * vec4(10.f, 0, 0, 1.f)));
 	mat4 car2ModelMatrix = t * t2 * r; //* s;;
 	modelViewProjectionMatrix = projectionMatrix * viewMatrix * car2ModelMatrix;
@@ -272,6 +272,7 @@ bool handleEvents(void)
 	// implement camera controls based on key states
 	const float speed = 10.f;
 	const float rotateSpeed = 2.f;
+	const float cameraSpeed = 0.5f;
 
 	if (!ImGui::GetIO().WantCaptureKeyboard)
 	{
@@ -293,6 +294,13 @@ bool handleEvents(void)
 		{
 			T = translate(-car_forward * speed * deltaTime) * T;
 		}
+		if (state[SDL_SCANCODE_W]) {
+			cameraPosition += cameraSpeed * cameraDirection;
+		}
+		if (state[SDL_SCANCODE_S]) {
+			cameraPosition -= cameraSpeed * cameraDirection;
+		}
+
 	}
 
 	

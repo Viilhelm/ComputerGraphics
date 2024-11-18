@@ -278,8 +278,8 @@ void initialize()
 
 	// You can find the valid values for this in `loadScenes`: "Ship", "Material Test" and "Cube"
 	changeScene("Ship");
-	//changeScene("Material Test");
-	//changeScene("Cube");
+	changeScene("Material Test");
+	changeScene("Cube");
 }
 
 void debugDrawLight(const glm::mat4& viewMatrix,

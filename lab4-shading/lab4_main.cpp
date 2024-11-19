@@ -168,6 +168,28 @@ void initFullScreenQuad()
 	if(fullScreenQuadVAO == 0)
 	{
 		// Task 4.1
+		static const glm::vec2 positions[] = { { -1.0f, -1.0f }, { 1.0f, -1.0f }, { 1.0f, 1.0f },
+											   { -1.0f, -1.0f }, { 1.0f, 1.0f },  { -1.0f, 1.0f } };
+		GLuint positionBuffer;
+		glGenBuffers(1, &positionBuffer);
+		// Set the newly created buffer as the current one
+		glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
+		// Send the vertex position data to the current buffer
+		glBufferData(GL_ARRAY_BUFFER, labhelper::array_length(positions) * sizeof(glm::vec2), positions,
+			GL_STATIC_DRAW);
+
+		glGenVertexArrays(1, &fullScreenQuadVAO);
+		// Bind the vertex array object
+		// The following calls will affect this vertex array object.
+		glBindVertexArray(fullScreenQuadVAO);
+		// Makes positionBuffer the current array buffer for subsequent calls.
+		glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
+		// Attaches positionBuffer to fullScreenQuadVAO, in the 0th attribute location
+		glVertexAttribPointer(0, 2, GL_FLOAT, false /*normalized*/, 0 /*stride*/, 0 /*offset*/);
+		// Enable the vertex position attribute
+		glEnableVertexAttribArray(0);
+
+		/*
 		glGenVertexArrays(1, &fullScreenQuadVAO);
 		glBindVertexArray(fullScreenQuadVAO);
 
@@ -176,13 +198,13 @@ void initFullScreenQuad()
 			-1.0f, -1.0f, // v0
 			-1.0f, 1.0f, // v1
 			1.0f,  1.0f, // v2
-			1.0f,  -1.0f, // v3
+			1.0f,  -1.0f // v3
 		};
 		glGenBuffers(1, &positionBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, positionBuffer);
 		glBufferData(GL_ARRAY_BUFFER, labhelper::array_length(positions) * sizeof(float), positions,
 			GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 2, GL_FLOAT, false /*normalized*/, 0 /*stride*/, 0 /*offset*/);
+		glVertexAttribPointer(0, 2, GL_FLOAT, false , 0 , 0 );
 		glEnableVertexAttribArray(0);
 
 		const int indices[] = {
@@ -195,6 +217,7 @@ void initFullScreenQuad()
 			GL_STATIC_DRAW);
 
 		glBindVertexArray(0);
+		*/
 	}
 }
 
@@ -207,6 +230,15 @@ void drawFullScreenQuad()
 	// draw a quad at full screen
 	///////////////////////////////////////////////////////////////////////////
 	// Task 4.2
+	GLboolean previous_depth_state;
+	glGetBooleanv(GL_DEPTH_TEST, &previous_depth_state);
+	glDisable(GL_DEPTH_TEST);
+	glBindVertexArray(fullScreenQuadVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	if (previous_depth_state)
+		glEnable(GL_DEPTH_TEST);
+
+	/*
 	GLboolean depth_test_enabled;
 	glGetBooleanv(GL_DEPTH_TEST, &depth_test_enabled);
 
@@ -222,6 +254,7 @@ void drawFullScreenQuad()
 	if (depth_test_enabled) {
 		glEnable(GL_DEPTH_TEST);
 	}
+	*/
 
 }
 

@@ -117,7 +117,19 @@ vec3 calculateIndirectIllumination(vec3 wo, vec3 n, vec3 base_color)
 	// Task 5 - Lookup the irradiance from the irradiance map and calculate
 	//          the diffuse reflection
 	///////////////////////////////////////////////////////////////////////////
+	vec3 n_ws = normalize((viewInverse * vec4(n, 0.0)).xyz);
 
+	float theta = acos(clamp(n_ws.y, -1.0f, 1.0f)); // ¦È: Ñö½Ç
+    float phi = atan(n_ws.z, n_ws.x);               // ¦Õ: ·½Î»½Ç
+    if(phi < 0.0f) {
+        phi += 2.0f * PI;
+    }
+
+	vec2 lookup = vec2(phi / (2.0 * PI), 1.0 - theta / PI);
+    vec3 irradiance = environment_multiplier * texture(irradianceMap, lookup).rgb;
+
+	vec3 diffuse_term = base_color * (1.0 / PI) * irradiance;
+	indirect_illum = diffuse_term;
 	///////////////////////////////////////////////////////////////////////////
 	// Task 6 - Look up in the reflection map from the perfect specular
 	//          direction and calculate the dielectric and metal terms.

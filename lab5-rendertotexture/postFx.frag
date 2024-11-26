@@ -104,6 +104,9 @@ vec3 toSepiaTone(vec3 rgbSample)
 
 	// transform to YIQ color space and set color information to sepia tone
 	vec3 yiq = vec3(dot(yiqTransform0, rgbSample), 0.2, 0.0);
+	//Red
+	//vec3 yiq = vec3(dot(yiqTransform0, rgbSample), 0.4, 0.1);
+
 
 	// inverse transform to RGB color space
 	vec3 result = vec3(dot(yiqInverseTransform0, yiq), dot(yiqInverseTransform1, yiq),
@@ -113,7 +116,9 @@ vec3 toSepiaTone(vec3 rgbSample)
 
 vec2 mushrooms(vec2 inCoord)
 {
-	return inCoord + vec2(sin(time * 4.3127 + inCoord.y / 9.0) * 15.0, 0.0);
+	return inCoord + vec2(sin(time * 4.3127 + inCoord.y / 9.0) * 15.0, 0.0); //Change 15 to 30
+	//return inCoord + vec2(sin(time * 4.3127 + inCoord.y / 9.0) * 15.0,
+                     // cos(time * 3.1415 + inCoord.x / 5.0) * 10.0); Add perturbations in multiple directions
 }
 
 vec3 blur(vec2 coord)
@@ -125,6 +130,7 @@ vec3 blur(vec2 coord)
 	{
 		for(float j = -filterSize / 2; j <= filterSize / 2; j += 1.0)
 		{
+			//float weight = abs(i - j) / (filterSize * filterSize); 
 			result += weight * textureRect(frameBufferTexture, coord + vec2(i, j)).rgb;
 		}
 	}

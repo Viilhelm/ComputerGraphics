@@ -401,12 +401,16 @@ void display()
 
 	glUseProgram(postFxShader);
 
+	// Task 4: Set the required uniforms
+	labhelper::setUniformSlow(postFxShader, "time", currentTime);
+	labhelper::setUniformSlow(postFxShader, "currentEffect", currentEffect);
+	labhelper::setUniformSlow(postFxShader, "filterSize", filterSizes[filterSize - 1]);
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, cameraFB.colorTextureTarget);
 
 	labhelper::drawFullScreenQuad();
 
-	// Task 4: Set the required uniforms
 
 	glUseProgram(0);
 

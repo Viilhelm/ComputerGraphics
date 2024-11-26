@@ -42,18 +42,25 @@ uniform float point_light_intensity_multiplier = 50.0;
 in vec2 texCoord;
 in vec3 viewSpaceNormal;
 in vec3 viewSpacePosition;
+in vec4 shadowMapCoord;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Input uniform variables
 ///////////////////////////////////////////////////////////////////////////////
 uniform mat4 viewInverse;
 uniform vec3 viewSpaceLightPosition;
+uniform mat4 lightMatrix;
+uniform int useSpotLight;
+uniform int useSoftFalloff;
+uniform vec3 viewSpaceLightDir;
+uniform float spotInnerAngle;
+uniform float spotOuterAngle;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Output color
 ///////////////////////////////////////////////////////////////////////////////
 layout(location = 0) out vec4 fragmentColor;
-
+layout(binding = 10) uniform sampler2D shadowMapTex;
 
 
 
@@ -150,7 +157,7 @@ void main()
 	float visibility = 1.0;
 	float attenuation = 1.0;
 
-
+	vec4 shadowMapCoord = lightMatrix * vec4(viewSpacePosition, 1.f);
 	vec3 wo = -normalize(viewSpacePosition);
 	vec3 n = normalize(viewSpaceNormal);
 
@@ -159,6 +166,9 @@ void main()
 	{
 		base_color = texture(colorMap, texCoord).rgb;
 	}
+
+	float depth = texture(shadowMapTex, shadowMapCoord.xy / shadowMapCoord.w).x;
+	visibility = (depth >= (shadowMapCoord.z / shadowMapCoord.w)) ? 1.0 : 0.0;
 
 	// Direct illumination
 	vec3 direct_illumination_term = visibility * calculateDirectIllumiunation(wo, n, base_color);

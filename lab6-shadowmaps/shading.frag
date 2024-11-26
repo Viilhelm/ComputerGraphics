@@ -59,12 +59,90 @@ layout(location = 0) out vec4 fragmentColor;
 
 vec3 calculateDirectIllumiunation(vec3 wo, vec3 n, vec3 base_color)
 {
-	return vec3(base_color);
+	vec3 direct_illum = base_color;
+	
+	vec3 wi = normalize(viewSpaceLightPosition - viewSpacePosition);
+    const float d = length(viewSpaceLightPosition - viewSpacePosition);
+
+	vec3 Li = point_light_intensity_multiplier * point_light_color * (1.0 / (d * d));
+
+	float nDotWi = dot(n, wi);
+    if (nDotWi <= 0.0) {
+        return vec3(0.0); 
+    }
+
+	
+		
+	vec3 diffuse_term = base_color * (1.0 / PI) * abs(nDotWi) * Li;
+	direct_illum = diffuse_term;
+
+	
+	vec3 wh = normalize(wi + wo);
+	float nDotWh = max(0.0001, dot(n, wh));
+	float D = (material_shininess + 2.0) / (2.0 * PI) * pow(nDotWh, material_shininess);
+
+	float whDotWi = max(0.0001, dot(wh, wi));
+	float F = material_fresnel + (1.0 - material_fresnel) * pow(1.0 - whDotWi, 5.0);
+
+	float nDotWo = max(0.0001, dot(n, wo)); 
+	float whDotWo = max(0.0001, dot(wo, wh));
+	float G = min(1.0, min((2.0 * nDotWh * nDotWo) / whDotWo, (2.0 * nDotWh * nDotWi) / whDotWo));
+
+	float brdf = (D * F * G) / (4.0 * clamp(nDotWo * nDotWi, 0.0001, 1.0));
+
+	direct_illum = brdf * nDotWi * Li; // * base_color 
+
+	
+	vec3 dielectric_term = brdf * nDotWi * Li + (1.0 - F) * diffuse_term;
+	vec3 metal_term = brdf * base_color * nDotWi * Li;
+
+	direct_illum = material_metalness * metal_term + (1.0 - material_metalness) * dielectric_term;
+
+	return direct_illum;
+	//return vec3(F);
 }
 
 vec3 calculateIndirectIllumination(vec3 wo, vec3 n, vec3 base_color)
 {
-	return vec3(0.0);
+	vec3 indirect_illum = vec3(0.f);
+	
+	vec3 n_ws = normalize((viewInverse * vec4(n, 0.0)).xyz);
+
+	float theta = acos(clamp(n_ws.y, -1.0f, 1.0f)); // ¦È: Ñö½Ç
+    float phi = atan(n_ws.z, n_ws.x);               // ¦Õ: ·½Î»½Ç
+    if(phi < 0.0f) {
+        phi += 2.0f * PI;
+    }
+
+	vec2 lookup = vec2(phi / (2.0 * PI), 1.0 - theta / PI);
+    vec3 irradiance = environment_multiplier * texture(irradianceMap, lookup).rgb;
+
+	vec3 diffuse_term = base_color * (1.0 / PI) * irradiance;
+	indirect_illum = diffuse_term;
+	
+	vec3 wi = normalize(reflect(-wo, n));
+    vec3 wi_ws = normalize((viewInverse * vec4(wi, 0.0)).xyz);
+
+	float spec_theta = acos(clamp(wi_ws.y, -1.0f, 1.0f));
+    float spec_phi = atan(wi_ws.z, wi_ws.x);
+    if(spec_phi < 0.0f) {
+        spec_phi += 2.0f * PI;
+    }
+    vec2 spec_lookup = vec2(spec_phi / (2.0 * PI), 1.0 - spec_theta / PI);
+
+	float roughness = sqrt(sqrt(2.0f / (material_shininess + 2.0))); 
+    vec3 Li = environment_multiplier * textureLod(reflectionMap, spec_lookup, roughness * 7.0f).rgb;
+
+	vec3 wh = normalize(wi + wo);
+	float whDotWi = max(0.0001, dot(wh, wi));
+	float F = material_fresnel + (1.0 - material_fresnel) * pow(1.0 - whDotWi, 5.0);
+
+	vec3 dielectric_term = F * Li + (1.0 - F) * diffuse_term;
+	vec3 metal_term = F * base_color * Li;
+
+	indirect_illum = material_metalness * metal_term + (1.0 - material_metalness) * dielectric_term;
+
+	return indirect_illum;
 }
 
 void main()

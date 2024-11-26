@@ -342,11 +342,32 @@ void display(void)
 	// Set up shadow map parameters
 	///////////////////////////////////////////////////////////////////////////
 	// Task 1
+	if (shadowMapFB.width != shadowMapResolution || shadowMapFB.height != shadowMapResolution)
+	{
+		shadowMapFB.resize(shadowMapResolution, shadowMapResolution);
+	}
 
+	glBindTexture(GL_TEXTURE_2D, shadowMapFB.depthBuffer);
+
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	
 	///////////////////////////////////////////////////////////////////////////
 	// Draw Shadow Map
 	///////////////////////////////////////////////////////////////////////////
+	glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFB.framebufferId);
+	glViewport(0, 0, shadowMapFB.width, shadowMapFB.height);
+	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glClearDepth(1.0);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
+
+	drawScene(simpleShaderProgram, lightViewMatrix, lightProjMatrix, lightViewMatrix, lightProjMatrix);
+
+
+	labhelper::Material& screen = landingpadModel->m_materials[8];
+	screen.m_emission_texture.gl_id = shadowMapFB.colorTextureTarget;
 	///////////////////////////////////////////////////////////////////////////
 	// Draw from camera
 	///////////////////////////////////////////////////////////////////////////

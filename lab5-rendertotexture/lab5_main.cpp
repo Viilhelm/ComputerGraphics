@@ -372,7 +372,9 @@ void display()
 	///////////////////////////////////////////////////////////////////////////
 	// draw scene from camera
 	///////////////////////////////////////////////////////////////////////////
-	glBindFramebuffer(GL_FRAMEBUFFER, 0); // to be replaced with another framebuffer when doing post processing
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0); // to be replaced with another framebuffer when doing post processing
+	FboInfo& cameraFB = fboList[1];
+	glBindFramebuffer(GL_FRAMEBUFFER, cameraFB.framebufferId);
 	glViewport(0, 0, w, h);
 	glClearColor(0.2f, 0.2f, 0.8f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -390,6 +392,17 @@ void display()
 	// 2. Set postFxShader as active
 	// 3. Bind the framebuffer to texture unit 0
 	// 4. Draw a quad over the entire viewport
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, w, h);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); // Clear to black for post-processing clarity
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glUseProgram(postFxShader);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, cameraFB.colorTextureTarget);
+
+	labhelper::drawFullScreenQuad();
 
 	// Task 4: Set the required uniforms
 

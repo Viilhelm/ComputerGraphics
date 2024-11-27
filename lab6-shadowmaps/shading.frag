@@ -1,4 +1,7 @@
 #version 420
+/* WARNNING: the following must match the values in lab6_main.cpp
+	 */
+#define SOLUTION_USE_BUILTIN_SHADOW_TEST 1
 
 // required by GLSL spec Sect 4.5.3 (though nvidia does not, amd does)
 precision highp float;
@@ -61,7 +64,8 @@ uniform int useSoftFalloff;
 // Output color
 ///////////////////////////////////////////////////////////////////////////////
 layout(location = 0) out vec4 fragmentColor;
-layout(binding = 10) uniform sampler2D shadowMapTex;
+//layout(binding = 10) uniform sampler2D shadowMapTex;
+layout(binding = 10) uniform sampler2DShadow shadowMapTex;
 
 
 
@@ -168,8 +172,9 @@ void main()
 		base_color = texture(colorMap, texCoord).rgb;
 	}
 
-	float depth = texture(shadowMapTex, shadowMapCoord.xy / shadowMapCoord.w).x;
-	visibility = (depth >= (shadowMapCoord.z / shadowMapCoord.w)) ? 1.0 : 0.0;
+	//float depth = texture(shadowMapTex, shadowMapCoord.xy / shadowMapCoord.w).x;
+	//visibility = (depth >= (shadowMapCoord.z / shadowMapCoord.w)) ? 1.0 : 0.0;
+	visibility = textureProj(shadowMapTex, shadowMapCoord);
 
 	if(useSpotLight == 1)
 	{

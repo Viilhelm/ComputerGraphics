@@ -12,6 +12,12 @@ layout(location = 2) in vec2 texCoordIn;
 uniform mat4 normalMatrix;
 uniform mat4 modelViewMatrix;
 uniform mat4 modelViewProjectionMatrix;
+uniform mat4 lightMatrix;
+uniform vec3 viewSpaceLightDir;
+uniform float spotOuterAngle;
+uniform float spotInnerAngle;
+uniform int useSpotLight;
+uniform int useSoftFalloff;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Output to fragment shader
@@ -19,6 +25,7 @@ uniform mat4 modelViewProjectionMatrix;
 out vec2 texCoord;
 out vec3 viewSpaceNormal;
 out vec3 viewSpacePosition;
+out vec4 shadowMapCoord;
 
 void main()
 {
@@ -26,4 +33,5 @@ void main()
 	texCoord = texCoordIn;
 	viewSpaceNormal = (normalMatrix * vec4(normalIn, 0.0)).xyz;
 	viewSpacePosition = (modelViewMatrix * vec4(position, 1.0)).xyz;
+	shadowMapCoord = lightMatrix * vec4(viewSpacePosition, 1.0);
 }

@@ -158,7 +158,7 @@ void main()
 	float visibility = 1.0;
 	float attenuation = 1.0;
 
-	vec4 shadowMapCoord = lightMatrix * vec4(viewSpacePosition, 1.f);
+	//vec4 shadowMapCoord = lightMatrix * vec4(viewSpacePosition, 1.f);
 	vec3 wo = -normalize(viewSpacePosition);
 	vec3 n = normalize(viewSpaceNormal);
 

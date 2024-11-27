@@ -335,6 +335,20 @@ void display(void)
 	mat4 lightViewMatrix = lookAt(lightPosition, vec3(0.0f), lightRot * worldUp);
 	mat4 lightProjMatrix = perspective(radians(45.0f), 1.0f, 25.0f, 100.0f);
 
+	/*Orthographic projection for sunlight
+	float sceneWidth = 100.0f;
+	float sceneHeight = 100.0f;
+	float nearPlane = 25.0f;
+	float farPlane = 100.0f;
+
+	float left = -sceneWidth / 2.0f;
+	float right = sceneWidth / 2.0f;
+	float bottom = -sceneHeight / 2.0f;
+	float top = sceneHeight / 2.0f;
+
+	mat4 lightProjMatrix = ortho(left, right, bottom, top, nearPlane, farPlane);
+	*/
+
 	///////////////////////////////////////////////////////////////////////////
 	// Bind the environment map(s) to unused texture units
 	///////////////////////////////////////////////////////////////////////////
